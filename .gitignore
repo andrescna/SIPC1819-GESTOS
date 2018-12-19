@@ -1,0 +1,8 @@
+# Ignore any executables
+
+*/.DS_Store
+handgesture.dSYM
+.vscode
+*.dSYM
+
+.DS_Store
