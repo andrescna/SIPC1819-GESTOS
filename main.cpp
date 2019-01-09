@@ -20,15 +20,13 @@ int main(int argc, char** argv)
 
 	Mat frame, bgmask, out_frame;
 
-
-
 	//Abrimos la webcam
 
 	VideoCapture cap;
 	cap.open(0);
 	if (!cap.isOpened())
 	{
-		printf("\nNo se puede abrir la c�mara\n");
+		printf("\nNo se puede abrir la cámara\n");
 		return -1;
 	}
         int cont = 0;
@@ -38,7 +36,7 @@ int main(int argc, char** argv)
                 ++cont;
         }
         if (cont >= 2000) {
-                printf("No se ha podido leer un frame v�lido\n");
+                printf("No se ha podido leer un frame válido\n");
                 exit(-1);
         }
 
@@ -54,9 +52,9 @@ int main(int argc, char** argv)
 
 	// iniciamos el proceso de obtenci�n del modelo del fondo
 
-MyBGSubtractorColor bgsubtractor(cap);
-bgsubtractor.LearnModel();
-
+	MyBGSubtractorColor bgsubtractor(cap);
+	
+	bgsubtractor.LearnModel();
 
 	for (;;)
 	{
@@ -71,12 +69,12 @@ bgsubtractor.LearnModel();
 		if ((char)c == 'q') break;
 
 		// obtenemos la máscara del fondo con el frame actual
-		bgsubtractor. ObtainBGMask(frame, bgmask);
+		bgsubtractor.ObtainBGMask(frame, bgmask);
 
                 // CODIGO 2.1
 		
 		// limpiar la máscara del fondo de ruido
-		medianBlur(bgmask, bgmask, 5);
+
 		int dilation_size = 5;
 
 		Mat element = (getStructuringElement(MORPH_RECT, Size(2 * dilation_size +1, 2* dilation_size +1), Point(dilation_size,dilation_size)));
@@ -84,7 +82,9 @@ bgsubtractor.LearnModel();
 		dilate(bgmask, bgmask, element);
 		erode(bgmask, bgmask, element);
 
-		
+		// CREO QUE ESTO VA AQUÍ 
+		medianBlur(bgmask, bgmask, 3);
+
                 //...
 
 
@@ -92,16 +92,13 @@ bgsubtractor.LearnModel();
 		
 		if (!bgmask.empty()){					//NO FUNCIONA AHORA MISMO
 			HandGesture temp;
-			temp.FeaturesDetection(bgmask,bgmask);
+			temp.FeaturesDetection(bgmask,frame);
 		}
 		
                 // mostramos el resultado de la sobstracci�n de fondo
-
-                // mostramos el resultado del reconocimento de gestos
-
-		imshow("Reconocimiento", frame);
 		imshow("Fondo", bgmask);
-
+                // mostramos el resultado del reconocimento de gestos
+		imshow("Reconocimiento", frame);
 
 	}
 

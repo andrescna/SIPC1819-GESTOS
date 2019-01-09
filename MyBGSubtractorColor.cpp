@@ -24,23 +24,23 @@ MyBGSubtractorColor::MyBGSubtractorColor(VideoCapture vc) {
 	upper_bounds = vector<Scalar>(max_samples);
 	means = vector<Scalar>(max_samples);
 
-	h_low = 12;
-        h_up = 7;
-	l_low = 30;
-	l_up = 40;
-	s_low = 80;
+	//VALORES POR DEFECTO
+    h_up = 55;
+	h_low = 75;
 	s_up = 80;
+	s_low = 60;
+	l_up = 45;
+	l_low = 75;
 
 
 	namedWindow("Trackbars");
 
-	createTrackbar("H low:", "Trackbars", &h_low, 100, &MyBGSubtractorColor::Trackbar_func);
 	createTrackbar("H high:", "Trackbars", &h_up, 100, &MyBGSubtractorColor::Trackbar_func);
-	createTrackbar("L low:", "Trackbars", &l_low, 100, &MyBGSubtractorColor::Trackbar_func);
-	createTrackbar("L high:", "Trackbars", &l_up, 100, &MyBGSubtractorColor::Trackbar_func);
-	createTrackbar("S low:", "Trackbars", &s_low, 100, &MyBGSubtractorColor::Trackbar_func);
+	createTrackbar("H low:", "Trackbars", &h_low, 100, &MyBGSubtractorColor::Trackbar_func);
 	createTrackbar("S high:", "Trackbars", &s_up, 100, &MyBGSubtractorColor::Trackbar_func);
-
+	createTrackbar("S low:", "Trackbars", &s_low, 100, &MyBGSubtractorColor::Trackbar_func);
+	createTrackbar("L high:", "Trackbars", &l_up, 100, &MyBGSubtractorColor::Trackbar_func);
+	createTrackbar("L low:", "Trackbars", &l_low, 100, &MyBGSubtractorColor::Trackbar_func);
 
 }
 
@@ -51,10 +51,6 @@ void MyBGSubtractorColor::Trackbar_func(int, void*)
 
 
 void MyBGSubtractorColor::LearnModel() {
-
-
-
-
 
 	Mat frame, tmp_frame, hls_frame;
 	std::vector<cv::Point> samples_positions;

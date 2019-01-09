@@ -45,6 +45,8 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
         // detección del contorno de la mano y selección del contorno más largo
         //...
 
+		//este bucle busca el contorno más largo
+		
 		//if (!mask.empty()){
 
 			findContours(mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
@@ -57,7 +59,7 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 
 		//}
 
-        // pintar el contorno
+        // pintar el contorno más largo
 		drawContours(output_img,contours, index, cv::Scalar(255, 0, 0), 2, 8, vector<Vec4i>(),0, Point());
         //...
 	
@@ -75,7 +77,7 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 		pt0 = pt;
 	}
 	
-        //obtener los defectos de convexidad
+    //obtener los defectos de convexidad
 	vector<Vec4i> defects;
 	convexityDefects(contours[index], hull, defects);
 		
@@ -90,9 +92,32 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 		
                         // CODIGO 3.2
                         // filtrar y mostrar los defectos de convexidad
+
+						if (angle < 90.0 && depth > 100.0) {
+
+							circle(output_img, f, 20, Scalar(255,0,0), 14, 8, 0);
+							cont++;
+						} 
+						
+						
+						//TIPS: alta profundidad
+						// ángulo máximo 
+						// OJO CON LA ESCALA (se hace con boundingrec)
+						/* el área del rectángulo (o cualquier medida se hace más pequeña, así que 
+						profundidad = 0,2 por boundingrec (o sea, el porcentaje del rectángulo)
+						en resumen: dejarlo en función del boundingrec
+
+						
+						ESTO ES EN PLAN if
+
+						*/
                         //...
 
                 }
-	
+
+	// COSA SUPER CUTRE PARA IMPRIMIR EL NUMERO DE DEDOS POR PANTALLA			
+	char dedos[3];
+	sprintf(dedos, "DEDOS %d", cont+1);
+	putText(output_img, dedos, cvPoint(100,100), CV_FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,0,0), 5, 8, false);
 		
 }
