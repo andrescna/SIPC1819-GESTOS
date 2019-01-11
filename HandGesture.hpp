@@ -15,10 +15,7 @@ public:
 	HandGesture();
 	void FeaturesDetection(cv::Mat mask, cv::Mat output_img);
 	
-
 private:
 	double getAngle(cv::Point s, cv::Point e, cv::Point f);
 	
-	
-
 };

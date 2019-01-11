@@ -46,22 +46,18 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
         //...
 
 		//este bucle busca el contorno más largo
-		
-		//if (!mask.empty()){
 
-			findContours(mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
+		findContours(mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
-			index=0;
-			for(int i = 0; i<contours.size(); i++){
-				if(contours.at(i).size() > contours.at(index).size())
-					index = i;
-			}
-
-		//}
+		index=0;
+		for(int i = 0; i<contours.size(); i++){
+			
+			if(contours.at(i).size() > contours.at(index).size())
+				index = i;
+		}
 
         // pintar el contorno más largo
 		drawContours(output_img,contours, index, cv::Scalar(255, 0, 0), 2, 8, vector<Vec4i>(),0, Point());
-        //...
 	
 
 	//obtener el convex hull	
@@ -84,40 +80,65 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 		
 		int cont = 0;
 		for (int i = 0; i < defects.size(); i++) {
+			
 			Point s = contours[index][defects[i][0]];
 			Point e = contours[index][defects[i][1]];
 			Point f = contours[index][defects[i][2]];
 			float depth = (float)defects[i][3] / 256.0;
 			double angle = getAngle(s, e, f);
 		
-                        // CODIGO 3.2
-                        // filtrar y mostrar los defectos de convexidad
+            // CODIGO 3.2
+            // filtrar y mostrar los defectos de convexidad
+	
+			//TIPS: alta profundidad
+			// ángulo máximo 
+			// OJO CON LA ESCALA (se hace con boundingrect)
+			/* 
+				el área del rectángulo (o cualquier medida se hace más pequeña, 
+				así que profundidad = 0.2 por boundingretc (o sea, el porcentaje del rectángulo)
+				En resumen: dejarlo en función del boundingrect 
+			*/
 
-						if (angle < 90.0 && depth > 100.0) {
+			// Rectángulo de contorno, para calcular la profundidad de los dedos
+			Rect hand_rect = boundingRect(contours[index]);
+			rectangle(output_img, hand_rect, Scalar(255,255,0), 2);
 
-							circle(output_img, f, 20, Scalar(255,0,0), 14, 8, 0);
-							cont++;
-						} 
-						
-						
-						//TIPS: alta profundidad
-						// ángulo máximo 
-						// OJO CON LA ESCALA (se hace con boundingrec)
-						/* el área del rectángulo (o cualquier medida se hace más pequeña, así que 
-						profundidad = 0,2 por boundingrec (o sea, el porcentaje del rectángulo)
-						en resumen: dejarlo en función del boundingrec
+			// Para distinguir los defectos de convexidad que corresponden a los dedos
+			if (angle < 90.0 && depth > 0.2 * hand_rect.height) {
+				circle(output_img, f, 5, Scalar(0,255,0), 5);
+				cont++;
+			}
 
-						
-						ESTO ES EN PLAN if
+        }
 
-						*/
-                        //...
+	// CONTADOR DEL NUMERO DE DEDOS POR PANTALLA
+	Rect hand_rect = boundingRect(contours[index]);
+	if (cont == 0 && hand_rect.height < 2 * hand_rect.width){ cont = -1;}
 
-                }
-
-	// COSA SUPER CUTRE PARA IMPRIMIR EL NUMERO DE DEDOS POR PANTALLA			
 	char dedos[3];
-	sprintf(dedos, "DEDOS %d", cont+1);
-	putText(output_img, dedos, cvPoint(100,100), CV_FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,0,0), 5, 8, false);
+	sprintf(dedos, "DEDOS: %d", cont+1);
+	putText(output_img, dedos, cvPoint(30,50), CV_FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,0,0), 2, 5, false);
+
+	// PUNTERO (SI SOLO HAY UN DEDO ABIERTO)
+	bool pointer = false;
+	if (cont==0){
+		Point p = contours[index][defects[0][0]];
+		for (int i = 1; i < defects.size(); i++) {	
+			Point s = contours[index][defects[i][0]];
+			if (s.y < p.y){
+				p = s;
+			}
+		}
+		circle(output_img, p, 5, Scalar(0,255,255), 5);
+		pointer = true;
+	}
+
+	// DETECTOR DE SI LA MANO ESTÁ ABIERTA O CERRADA
+	if (cont == -1 && pointer == false){
+	putText(output_img, "MANO CERRADA", cvPoint(200,50), CV_FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,0,255), 2, 5, false);
+	}
+	if (cont == 4){
+	putText(output_img, "MANO ABIERTA", cvPoint(200,50), CV_FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,255,0), 2, 5, false);
+	}
 		
 }

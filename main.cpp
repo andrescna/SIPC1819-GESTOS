@@ -40,29 +40,28 @@ int main(int argc, char** argv)
                 exit(-1);
         }
 
-	// Creamos las ventanas que vamos a usar en la aplicaci�n
+	// Creamos las ventanas que vamos a usar en la aplicación
 
 	namedWindow("Reconocimiento");
 	namedWindow("Fondo");
 
-        // creamos el objeto para la substracci�n de fondo
+        // creamos el objeto para la substracción de fondo
+
+	MyBGSubtractorColor bgsubtractor(cap);
 
 	// creamos el objeto para el reconocimiento de gestos
 
-
-	// iniciamos el proceso de obtenci�n del modelo del fondo
-
-	MyBGSubtractorColor bgsubtractor(cap);
-	
 	bgsubtractor.LearnModel();
+
+	// iniciamos el proceso de obtención del modelo del fondo
 
 	for (;;)
 	{
 		cap >> frame;
-		//flip(frame, frame, 1);
+		flip(frame, frame, 1);
 		if (frame.empty())
 		{
-			printf("Le�do frame vac�o\n");
+			printf("Leído frame vacío\n");
 			continue;
 		}
 		int c = cvWaitKey(40);
@@ -74,28 +73,22 @@ int main(int argc, char** argv)
                 // CODIGO 2.1
 		
 		// limpiar la máscara del fondo de ruido
+		medianBlur(bgmask, bgmask, 5);
 
 		int dilation_size = 5;
-
 		Mat element = (getStructuringElement(MORPH_RECT, Size(2 * dilation_size +1, 2* dilation_size +1), Point(dilation_size,dilation_size)));
 
 		dilate(bgmask, bgmask, element);
 		erode(bgmask, bgmask, element);
 
-		// CREO QUE ESTO VA AQUÍ 
-		medianBlur(bgmask, bgmask, 3);
-
-                //...
-
-
-		// deteccion de las caracter�sticas de la mano
+		// deteccion de las características de la mano
 		
-		if (!bgmask.empty()){					//NO FUNCIONA AHORA MISMO
+		if (!bgmask.empty()){					
 			HandGesture temp;
 			temp.FeaturesDetection(bgmask,frame);
 		}
 		
-                // mostramos el resultado de la sobstracci�n de fondo
+                // mostramos el resultado de la sobstracción de fondo
 		imshow("Fondo", bgmask);
                 // mostramos el resultado del reconocimento de gestos
 		imshow("Reconocimiento", frame);
