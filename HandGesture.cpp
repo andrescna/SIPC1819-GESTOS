@@ -47,6 +47,7 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 
 		//este bucle busca el contorno más largo
 
+		if (!mask.empty()){
 		findContours(mask, contours, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_SIMPLE);
 
 		index=0;
@@ -58,7 +59,7 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 
         // pintar el contorno más largo
 		drawContours(output_img,contours, index, cv::Scalar(255, 0, 0), 2, 8, vector<Vec4i>(),0, Point());
-	
+		
 
 	//obtener el convex hull	
 	vector<int> hull;
@@ -89,7 +90,7 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 		
             // CODIGO 3.2
             // filtrar y mostrar los defectos de convexidad
-	
+
 			//TIPS: alta profundidad
 			// ángulo máximo 
 			// OJO CON LA ESCALA (se hace con boundingrect)
@@ -110,10 +111,10 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 			}
 
         }
-
+	
 	// CONTADOR DEL NUMERO DE DEDOS POR PANTALLA
 	Rect hand_rect = boundingRect(contours[index]);
-	if (cont == 0 && hand_rect.height < 2 * hand_rect.width){ cont = -1;}
+	if (cont == 0 && hand_rect.height < 1.35 * hand_rect.width){ cont = -1;}
 
 	char dedos[3];
 	sprintf(dedos, "DEDOS: %d", cont+1);
@@ -135,10 +136,12 @@ void HandGesture::FeaturesDetection(Mat mask, Mat output_img) {
 
 	// DETECTOR DE SI LA MANO ESTÁ ABIERTA O CERRADA
 	if (cont == -1 && pointer == false){
-	putText(output_img, "MANO CERRADA", cvPoint(200,50), CV_FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,0,255), 2, 5, false);
+		putText(output_img, "MANO CERRADA", cvPoint(200,50), CV_FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,0,255), 2, 5, false);
 	}
 	if (cont == 4){
-	putText(output_img, "MANO ABIERTA", cvPoint(200,50), CV_FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,255,0), 2, 5, false);
+		putText(output_img, "MANO ABIERTA", cvPoint(200,50), CV_FONT_HERSHEY_SIMPLEX, 1.0, Scalar(0,255,0), 2, 5, false);
+	}
+
 	}
 		
 }
